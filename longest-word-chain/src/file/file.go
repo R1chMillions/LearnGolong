@@ -2,6 +2,7 @@ package file
 
 import (
 	"bufio"
+	"container/list"
 	"fmt"
 	"io"
 	"os"
@@ -11,43 +12,42 @@ func WriteFileAndCreate(fileName string, dataArr []string) {
 	file, err := os.Open(fileName)
 
 	if err != nil {
-		fmt.Println("Create File. Name:%s", fileName)
+		fmt.Printf("Create File. Name: %s\n", fileName)
 		file, err = os.Create(fileName)
 		if err != nil {
-			fmt.Println("Create failed error:%s", err)
+			fmt.Printf("Create failed error: %s\n", err)
 			return
 		}
-		fmt.Println("File '%s' Created!", fileName)
+		fmt.Printf("File '%s' Created!\n", fileName)
 	}
 
 	fmt.Println("Writing data...")
 	for _, item := range dataArr {
 		file.WriteString(item)
+		file.WriteString("\n")
 	}
 	fmt.Println("Done")
 }
 
-
-func RedaDate(fileName string) ([]string, error) {
+func RedaDate(fileName string) (*list.List, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		fmt.Println("read failed")
 		return nil, err
 	}
-	var strArr []string
+	var l = list.New()
 	bfRd := bufio.NewReader(file)
-	var index = 0
-	strArr = make([]string,5)
 	for {
 		line, err := bfRd.ReadBytes('\n')
-		strArr[index] = string(line)
-		index++
-		if err != nil {
-			if err == io.EOF {
-				return strArr, nil
-			}
-			return strArr, err
+		str := string(line)
+		if str == "" || str == "\n" {
+			continue
+		}
+		l.PushBack(string(line))
+		if err == io.EOF {
+			return l, nil
+		} else if err != nil {
+			return l, err
 		}
 	}
-	return strArr, err
 }
