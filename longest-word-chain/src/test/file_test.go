@@ -1,15 +1,18 @@
 package test
 
 import (
+	"container/list"
 	"fmt"
 	"longest-word-chain/src/file"
 	"testing"
 )
 
 func TestFile(t *testing.T) {
-	fmt.Println("hello world!")
-	strArr := []string{"123", "fuck", "go"}
-	file.WriteFileAndCreate("test", strArr)
+	list := list.New()
+	list.PushBack("123")
+	list.PushBack("test")
+	list.PushBack("go")
+	file.WriteFileAndCreate("test", list)
 	lines, err := file.RedaDate("test")
 	if err != nil {
 		fmt.Println("error")
