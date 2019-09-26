@@ -3,11 +3,10 @@ package main
 import (
 	"container/list"
 	"fmt"
-	"longest-word-chain/src/file"
 	"longest-word-chain/src/plist"
 )
 
-func Do(l *list.List) {
+func Do(l *list.List) *list.List {
 	hc, ec := GetWordHeaderAndEnd(l)
 	graph := MakeGraph(hc, ec, l.Len())
 
@@ -33,8 +32,10 @@ func Do(l *list.List) {
 			chans.PushBack(chanList)
 		}
 	}
-	PrintMax(l, chans)
-	PrintAll(l, chans)
+	max := GetMaxChan(chans)
+	PrintMax(max)
+	PrintAll(chans)
+	return max
 }
 
 func MakeGraph(headerChars []byte, endChars []byte, lenth int) [][]int {
@@ -69,7 +70,20 @@ func GetWordHeaderAndEnd(l *list.List) ([]byte, []byte) {
 	return headerArr, endArr
 }
 
-func PrintAll(l *list.List, chans *list.List) {
+func GetMaxChan(chans *list.List) *list.List {
+	lenth := 0
+	var maxChan *list.List
+	for chan1 := chans.Front(); chan1 != nil; chan1 = chan1.Next() {
+		curr := chan1.Value.(*list.List)
+		if lenth < curr.Len() {
+			lenth = curr.Len()
+			maxChan = curr
+		}
+	}
+	return maxChan
+}
+
+func PrintAll(chans *list.List) {
 	fmt.Print("\n\nPrint all:\n")
 	i := 0
 	for chan1 := chans.Front(); chan1 != nil; chan1 = chan1.Next() {
@@ -82,19 +96,7 @@ func PrintAll(l *list.List, chans *list.List) {
 	}
 }
 
-func PrintMax(l *list.List, chans *list.List) {
-	lenth := 0
-	var maxChan *list.List
-	for chan1 := chans.Front(); chan1 != nil; chan1 = chan1.Next() {
-		curr := chan1.Value.(*list.List)
-		if lenth < curr.Len() {
-			lenth = curr.Len()
-			maxChan = curr
-		}
-	}
-
-	file.WriteFileAndCreate("answer", maxChan)
-
+func PrintMax(maxChan *list.List) {
 	fmt.Print("\n\nPrint max:\n")
 	for item := maxChan.Front(); item != nil; item = item.Next() {
 		fmt.Printf("%s ", item.Value)
