@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
-func WriteFileAndCreate(fileName string, dataArr []string) {
+func WriteFileAndCreate(fileName string, list *list.List) {
 	file, err := os.Open(fileName)
 
 	if err != nil {
@@ -22,9 +23,9 @@ func WriteFileAndCreate(fileName string, dataArr []string) {
 	}
 
 	fmt.Println("Writing data...")
-	for _, item := range dataArr {
-		file.WriteString(item)
-		file.WriteString("\n")
+	for item := list.Front(); item != nil; item = item.Next() {
+		file.WriteString(item.Value.(string))
+		file.WriteString(" ")
 	}
 	fmt.Println("Done")
 }
@@ -43,7 +44,7 @@ func RedaDate(fileName string) (*list.List, error) {
 		if str == "" || str == "\n" {
 			continue
 		}
-		l.PushBack(string(line))
+		l.PushBack(strings.ToLower(strings.Replace(str, "\n", "", -1)))
 		if err == io.EOF {
 			return l, nil
 		} else if err != nil {
